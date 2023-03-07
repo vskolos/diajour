@@ -1,20 +1,32 @@
 import { type FormEvent, useState } from 'react'
+import { ArrowUturnLeftIcon } from '@heroicons/react/24/outline'
 
 import type { NextPage } from 'next'
 import { api } from '@/utils/api'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { Header } from '@/partials'
+import Link from 'next/link'
 import { toast } from 'react-hot-toast'
 
-const Add: NextPage = () => {
+const EditEntry: NextPage = () => {
+  const router = useRouter()
+  const id = router.query.id as string
+
+  const { data: dataEntry } = api.data.getById.useQuery(
+    { id },
+    {
+      onSuccess: (data) => !data && void router.push('/add'),
+      onError: (error) => toast.error(error.message),
+    }
+  )
+
   const [date, setDate] = useState('')
   const [timePeriod, setTimePeriod] = useState<TimePeriod>('morning')
   const [glucoseAmount, setGlucoseAmount] = useState('')
   const [insulinDosage, setInsulinDosage] = useState('')
   const [weight, setWeight] = useState('')
 
-  const router = useRouter()
   const { mutate: addDataEntry } = api.data.add.useMutation({
     onSuccess: () => router.push('/'),
     onError: (error) => toast.error(error.message),
@@ -111,8 +123,15 @@ const Add: NextPage = () => {
           </button>
         </form>
       </main>
+
+      <Link
+        href="/"
+        className="absolute bottom-4 right-4 rounded-full bg-cyan-600 p-3 text-white hover:bg-cyan-700 focus-visible:bg-cyan-700 active:bg-cyan-600 disabled:pointer-events-none disabled:opacity-75"
+      >
+        <ArrowUturnLeftIcon className="h-6 w-6" />
+      </Link>
     </>
   )
 }
 
-export default Add
+export default EditEntry

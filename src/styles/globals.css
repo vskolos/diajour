@@ -3,9 +3,10 @@
 @tailwind utilities;
 
 body {
+  margin-inline: auto;
   position: relative;
-  min-width: 22.5rem;
+  width: 24rem;
   min-height: 100vh;
   min-height: 100dvh;
-  background-color: #3f3f46;
+  background-color: #27272a;
 }
