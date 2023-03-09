@@ -13,10 +13,10 @@ export const dataRouter = createTRPCRouter({
   ),
 
   getById: protectedProcedure
-    .input(z.object({ id: z.string() }))
+    .input(z.string())
     .query(
       async ({ ctx, input }) =>
-        await ctx.prisma.data.findUnique({ where: { id: input.id } })
+        await ctx.prisma.data.findUnique({ where: { id: input } })
     ),
 
   add: protectedProcedure
@@ -56,20 +56,39 @@ export const dataRouter = createTRPCRouter({
     .input(
       z.object({
         id: z.string(),
+        date: z.date(),
+        timePeriod: z.string(),
         glucoseAmount: z.number(),
         insulinDosage: z.number().nullable(),
         weight: z.number().nullable(),
       })
     )
-    .query(
-      async ({ ctx, input }) =>
-        await ctx.prisma.data.update({
-          where: { id: input.id },
-          data: {
-            glucoseAmount: input.glucoseAmount,
-            insulinDosage: input.insulinDosage,
-            weight: input.weight,
-          },
+    .mutation(async ({ ctx, input }) => {
+      const entries = await ctx.prisma.data.findMany({
+        where: { date: input.date, timePeriod: input.timePeriod },
+      })
+
+      if (entries.length > 0 && entries?.[0]?.id !== input.id)
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Данные за этот период уже добавлены',
         })
-    ),
+      await ctx.prisma.data.update({
+        where: { id: input.id },
+        data: {
+          date: input.date,
+          timePeriod: input.timePeriod,
+          glucoseAmount: input.glucoseAmount,
+          insulinDosage: input.insulinDosage,
+          weight: input.weight,
+        },
+      })
+    }),
+
+  remove: protectedProcedure.input(z.string()).mutation(
+    async ({ ctx, input }) =>
+      await ctx.prisma.data.delete({
+        where: { id: input },
+      })
+  ),
 })

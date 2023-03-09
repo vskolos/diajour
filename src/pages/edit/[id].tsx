@@ -1,25 +1,16 @@
 import { type FormEvent, useState } from 'react'
-import { ArrowUturnLeftIcon } from '@heroicons/react/24/outline'
 
 import type { NextPage } from 'next'
 import { api } from '@/utils/api'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { Header } from '@/partials'
-import Link from 'next/link'
 import { toast } from 'react-hot-toast'
+import { formatDate } from '@/utils'
 
 const EditEntry: NextPage = () => {
   const router = useRouter()
   const id = router.query.id as string
-
-  const { data: dataEntry } = api.data.getById.useQuery(
-    { id },
-    {
-      onSuccess: (data) => !data && void router.push('/add'),
-      onError: (error) => toast.error(error.message),
-    }
-  )
 
   const [date, setDate] = useState('')
   const [timePeriod, setTimePeriod] = useState<TimePeriod>('morning')
@@ -27,109 +18,143 @@ const EditEntry: NextPage = () => {
   const [insulinDosage, setInsulinDosage] = useState('')
   const [weight, setWeight] = useState('')
 
+  api.data.getById.useQuery(id, {
+    onSuccess: (data) => {
+      if (!data) return id !== 'new' && void router.push('/edit/new')
+
+      setDate(formatDate(data.date))
+      setTimePeriod(data.timePeriod as TimePeriod)
+      setGlucoseAmount(`${data.glucoseAmount}`)
+      setInsulinDosage(`${data.insulinDosage ?? ''}`)
+      setWeight(`${data.weight ?? ''}`)
+    },
+    onError: (error) => toast.error(error.message),
+    enabled: id !== undefined,
+  })
+
   const { mutate: addDataEntry } = api.data.add.useMutation({
     onSuccess: () => router.push('/'),
     onError: (error) => toast.error(error.message),
   })
 
-  function handleAddDataEntry(e: FormEvent) {
+  const { mutate: editDataEntry } = api.data.edit.useMutation({
+    onSuccess: () => router.push('/'),
+    onError: (error) => toast.error(error.message),
+  })
+
+  const { mutate: removeDataEntry } = api.data.remove.useMutation({
+    onSuccess: () => router.push('/'),
+    onError: (error) => toast.error(error.message),
+  })
+
+  function handleEditDataEntry(e: FormEvent) {
     e.preventDefault()
     if (!date || !timePeriod || !glucoseAmount) return
 
-    addDataEntry({
+    const input = {
+      id,
       date: new Date(date),
       timePeriod,
       glucoseAmount: Number(glucoseAmount),
       insulinDosage: insulinDosage ? Number(insulinDosage) : null,
       weight: weight ? Number(weight) : null,
-    })
+    }
+
+    id === 'new' ? addDataEntry(input) : editDataEntry(input)
   }
 
   return (
     <>
       <Head>
-        <title>Добавить замер</title>
-        <meta name="description" content="Добавление замера глюкозы" />
+        <title>{id === 'new' ? 'Добавить' : 'Редактировать'} замер</title>
+        <meta name="description" content="Редактирование замера глюкозы" />
       </Head>
       <Header />
-      <main className="flex flex-col items-center justify-center gap-4">
-        <form className="grid grid-cols-3 gap-4" onSubmit={handleAddDataEntry}>
-          <label className="grid justify-items-start">
-            <span className="text-sm">Дата</span>
-            <input
-              className="rounded border border-neutral-400 px-1"
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-            />
-          </label>
-          <label className="grid justify-items-start">
-            <span className="text-sm">Период</span>
-            <select
-              className="rounded border border-neutral-400 px-1"
-              value={timePeriod}
-              onChange={(e) => setTimePeriod(e.target.value as TimePeriod)}
+      <main className="grid gap-2">
+        <div className="grid overflow-hidden rounded-xl">
+          <h1 className="bg-zinc-700 px-6 py-4 text-xl font-semibold text-zinc-100">
+            {id === 'new' ? 'Добавить' : 'Редактировать'} замер
+          </h1>
+          <form className="grid bg-zinc-600" onSubmit={handleEditDataEntry}>
+            <label className="grid grid-cols-4 items-center gap-8 px-6 py-3.5 even:bg-zinc-700">
+              <span className="text-lg font-medium text-zinc-100">Дата</span>
+              <input
+                className="col-span-3 border border-transparent border-b-zinc-500 bg-transparent text-lg text-zinc-200 placeholder:text-zinc-500 focus-visible:border-b-zinc-300 focus-visible:outline-none"
+                type="date"
+                placeholder="ДД.ММ.ГГГГ"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+              />
+            </label>
+            <label className="grid grid-cols-4 items-center gap-8 px-6 py-3.5 even:bg-zinc-700">
+              <span className="text-lg font-medium text-zinc-100">Период</span>
+              <select
+                className="col-span-3 border border-transparent border-b-zinc-500 bg-transparent text-lg text-zinc-200 placeholder:text-zinc-500 focus-visible:border-b-zinc-300 focus-visible:outline-none"
+                value={timePeriod}
+                onChange={(e) => setTimePeriod(e.target.value as TimePeriod)}
+              >
+                <option value="morning">Утро</option>
+                <option value="midday">День</option>
+                <option value="evening">Вечер</option>
+              </select>
+            </label>
+            <label className="grid grid-cols-4 items-center gap-8 px-6 py-3.5 even:bg-zinc-700">
+              <span className="text-lg font-medium text-zinc-100">Глюкоза</span>
+              <input
+                className="col-span-3 border border-transparent border-b-zinc-500 bg-transparent text-lg text-zinc-200 placeholder:text-zinc-500 focus-visible:border-b-zinc-300 focus-visible:outline-none"
+                type="text"
+                inputMode="decimal"
+                placeholder="16.5"
+                value={glucoseAmount}
+                onChange={(e) =>
+                  setGlucoseAmount(e.target.value.replaceAll(/[^0-9\.]/g, ''))
+                }
+              />
+            </label>
+            <label className="grid grid-cols-4 items-center gap-8 px-6 py-3.5 even:bg-zinc-700">
+              <span className="text-lg font-medium text-zinc-100">Инсулин</span>
+              <input
+                className="col-span-3 border border-transparent border-b-zinc-500 bg-transparent text-lg text-zinc-200 placeholder:text-zinc-500 focus-visible:border-b-zinc-300 focus-visible:outline-none"
+                type="text"
+                inputMode="decimal"
+                placeholder="2.5"
+                value={insulinDosage}
+                onChange={(e) =>
+                  setInsulinDosage(e.target.value.replaceAll(/[^0-9\.]/g, ''))
+                }
+              />
+            </label>
+            <label className="grid grid-cols-4 items-center gap-8 px-6 py-3.5 even:bg-zinc-700">
+              <span className="text-lg font-medium text-zinc-100">Вес</span>
+              <input
+                className="col-span-3 border border-transparent border-b-zinc-500 bg-transparent text-lg text-zinc-200 placeholder:text-zinc-500 focus-visible:border-b-zinc-300 focus-visible:outline-none"
+                type="text"
+                inputMode="decimal"
+                placeholder="3.5"
+                value={weight}
+                onChange={(e) =>
+                  setWeight(e.target.value.replaceAll(/[^0-9\.]/g, ''))
+                }
+              />
+            </label>
+            <button
+              className="col-span-full bg-green-600 p-4 text-xl font-medium text-white hover:bg-green-700 focus-visible:bg-green-700 active:bg-green-600 disabled:pointer-events-none disabled:opacity-75"
+              type="submit"
+              disabled={!date || !glucoseAmount}
             >
-              <option value="morning">Утро</option>
-              <option value="midday">День</option>
-              <option value="evening">Вечер</option>
-            </select>
-          </label>
-          <label className="grid justify-items-start">
-            <span className="text-sm">Глюкоза</span>
-            <input
-              className="rounded border border-neutral-400 px-1"
-              type="text"
-              inputMode="numeric"
-              size={6}
-              value={glucoseAmount}
-              onChange={(e) =>
-                setGlucoseAmount(e.target.value.replaceAll(/[^0-9\.]/g, ''))
-              }
-            />
-          </label>
-          <label className="grid justify-items-start">
-            <span className="text-sm">Инсулин</span>
-            <input
-              className="rounded border border-neutral-400 px-1"
-              type="text"
-              inputMode="numeric"
-              size={6}
-              value={insulinDosage}
-              onChange={(e) =>
-                setInsulinDosage(e.target.value.replaceAll(/[^0-9\.]/g, ''))
-              }
-            />
-          </label>
-          <label className="grid justify-items-start">
-            <span className="text-sm">Вес</span>
-            <input
-              className="rounded border border-neutral-400 px-1"
-              type="text"
-              inputMode="numeric"
-              size={6}
-              value={weight}
-              onChange={(e) =>
-                setWeight(e.target.value.replaceAll(/[^0-9\.]/g, ''))
-              }
-            />
-          </label>
+              Сохранить
+            </button>
+          </form>
+        </div>
+        {id !== 'new' && (
           <button
-            className="col-span-full justify-self-center rounded bg-green-600 py-1 px-2 text-white hover:bg-green-700 focus-visible:bg-green-700 active:bg-green-600 disabled:pointer-events-none disabled:opacity-75"
-            type="submit"
-            disabled={!glucoseAmount}
+            className="justify-self-center border-b border-red-600 text-red-600 hover:border-red-500 hover:text-red-500 focus-visible:border-red-500 focus-visible:text-red-500 active:border-red-600 active:text-red-600"
+            onClick={() => removeDataEntry(id)}
           >
-            Добавить
+            Удалить
           </button>
-        </form>
+        )}
       </main>
-
-      <Link
-        href="/"
-        className="absolute bottom-4 right-4 rounded-full bg-cyan-600 p-3 text-white hover:bg-cyan-700 focus-visible:bg-cyan-700 active:bg-cyan-600 disabled:pointer-events-none disabled:opacity-75"
-      >
-        <ArrowUturnLeftIcon className="h-6 w-6" />
-      </Link>
     </>
   )
 }

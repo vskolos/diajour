@@ -14,7 +14,7 @@ export function DataEntryRow({ entry }: { entry: Data }) {
       href={`/edit/${entry.id}`}
       className="grid grid-cols-4 items-center gap-2"
     >
-      <span className="font-medium text-zinc-100">
+      <span className="text-lg font-medium text-zinc-100">
         {TimePeriod[entry.timePeriod as TimePeriod]}
       </span>
       <div
@@ -26,8 +26,6 @@ export function DataEntryRow({ entry }: { entry: Data }) {
             ? 'bg-orange-600'
             : entry.glucoseAmount < 18
             ? 'bg-green-600'
-            : entry.glucoseAmount < 26
-            ? 'bg-sky-600'
             : entry.glucoseAmount < 26
             ? 'bg-sky-600'
             : 'bg-purple-600'

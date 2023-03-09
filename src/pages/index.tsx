@@ -75,7 +75,7 @@ const Home: NextPage = () => {
                 </span>
               ))}
             </span>
-            <ul className="bg-zinc-600 text-lg">
+            <ul className="bg-zinc-600">
               {entries
                 .sort((a, b) => a.timePeriod.localeCompare(b.timePeriod))
                 .map((entry) => (
