@@ -107,7 +107,11 @@ const EditEntry: NextPage = () => {
                 placeholder="16.5"
                 value={glucoseAmount}
                 onChange={(e) =>
-                  setGlucoseAmount(e.target.value.replaceAll(/[^0-9\.]/g, ''))
+                  setGlucoseAmount(
+                    e.target.value
+                      .replaceAll(',', '.')
+                      .replaceAll(/[^0-9\.]/g, '')
+                  )
                 }
               />
             </label>
@@ -120,7 +124,11 @@ const EditEntry: NextPage = () => {
                 placeholder="2.5"
                 value={insulinDosage}
                 onChange={(e) =>
-                  setInsulinDosage(e.target.value.replaceAll(/[^0-9\.]/g, ''))
+                  setInsulinDosage(
+                    e.target.value
+                      .replaceAll(',', '.')
+                      .replaceAll(/[^0-9\.]/g, '')
+                  )
                 }
               />
             </label>
@@ -133,7 +141,11 @@ const EditEntry: NextPage = () => {
                 placeholder="3.5"
                 value={weight}
                 onChange={(e) =>
-                  setWeight(e.target.value.replaceAll(/[^0-9\.]/g, ''))
+                  setWeight(
+                    e.target.value
+                      .replaceAll(',', '.')
+                      .replaceAll(/[^0-9\.]/g, '')
+                  )
                 }
               />
             </label>
