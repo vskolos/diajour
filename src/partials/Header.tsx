@@ -42,7 +42,7 @@ export function Header() {
         <span className="flex-grow text-zinc-200">
           {sessionData.user.name ?? ''}
         </span>
-        {router.pathname.startsWith('/edit') ? (
+        {router.pathname !== '/' ? (
           <Link
             href="/"
             className="rounded-full bg-cyan-600 p-3 text-white hover:bg-cyan-700 focus-visible:bg-cyan-700 active:bg-cyan-600 disabled:pointer-events-none disabled:opacity-75"
@@ -51,7 +51,7 @@ export function Header() {
           </Link>
         ) : (
           <Link
-            href="/edit/new"
+            href="/new"
             className="rounded-full bg-emerald-600 p-3 text-white hover:bg-emerald-700 focus-visible:bg-emerald-700 active:bg-emerald-600 disabled:pointer-events-none disabled:opacity-75"
           >
             <PlusIcon className="h-6 w-6" />

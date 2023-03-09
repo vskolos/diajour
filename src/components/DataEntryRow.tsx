@@ -10,10 +10,7 @@ const TimePeriod: Record<TimePeriod, string> = {
 
 export function DataEntryRow({ entry }: { entry: Data }) {
   return (
-    <Link
-      href={`/edit/${entry.id}`}
-      className="grid grid-cols-4 items-center gap-2"
-    >
+    <Link href={`/${entry.id}`} className="grid grid-cols-4 items-center gap-2">
       <span className="text-lg font-medium text-zinc-100">
         {TimePeriod[entry.timePeriod as TimePeriod]}
       </span>

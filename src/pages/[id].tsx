@@ -20,7 +20,7 @@ const EditEntry: NextPage = () => {
 
   api.data.getById.useQuery(id, {
     onSuccess: (data) => {
-      if (!data) return id !== 'new' && void router.push('/edit/new')
+      if (!data) return id !== 'new' && void router.push('/new')
 
       setDate(formatDate(data.date))
       setTimePeriod(data.timePeriod as TimePeriod)
