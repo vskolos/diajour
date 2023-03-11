@@ -6,6 +6,7 @@ import { api } from '@/utils/api'
 
 import '@/styles/globals.css'
 import { Toaster } from 'react-hot-toast'
+import { TableModeProvider } from '@/contexts'
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
@@ -13,8 +14,10 @@ const MyApp: AppType<{ session: Session | null }> = ({
 }) => {
   return (
     <SessionProvider session={session}>
-      <Component {...pageProps} />
-      <Toaster />
+      <TableModeProvider>
+        <Component {...pageProps} />
+        <Toaster />
+      </TableModeProvider>
     </SessionProvider>
   )
 }

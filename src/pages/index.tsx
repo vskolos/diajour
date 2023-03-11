@@ -8,9 +8,12 @@ import { DataEntryRow } from '@/components'
 import { Header } from '@/partials'
 import { type Data } from '@prisma/client'
 import { useCallback, useMemo } from 'react'
+import { useTableMode } from '@/contexts'
+import clsx from 'clsx'
 
 const Home: NextPage = () => {
-  const { data: sessionData } = useSession()
+  const [tableMode] = useTableMode()
+  const { data: sessionData, status: sessionStatus } = useSession()
   const { data: dataEntries } = api.data.getAll.useQuery(undefined, {
     enabled: sessionData?.user !== undefined,
   })
@@ -48,11 +51,11 @@ const Home: NextPage = () => {
     <>
       <Head>
         <title>Diacates</title>
-        <meta name="description" content="Отслеживание глюкозы Саманты" />
+        <meta name="description" content="Отслеживание глюкозы" />
       </Head>
       <Header />
-      <main className="grid gap-6">
-        {!sessionData?.user && (
+      <main className={clsx('grid', !tableMode && 'gap-6')}>
+        {sessionStatus === 'unauthenticated' && (
           <div className="absolute inset-0 grid place-items-center">
             <button
               className="grid aspect-square place-items-center rounded-full bg-indigo-600 p-8 text-white hover:bg-indigo-700 focus-visible:bg-indigo-700 active:bg-indigo-600"
@@ -64,22 +67,54 @@ const Home: NextPage = () => {
           </div>
         )}
         {Array.from(entriesMap).map(([date, entries]) => (
-          <div key={date} className="grid overflow-hidden rounded-xl">
-            <span className="flex items-center justify-between gap-4 bg-zinc-700 px-6 py-4">
+          <div
+            key={date}
+            className={clsx('grid overflow-hidden', !tableMode && 'rounded-xl')}
+          >
+            <span
+              className={clsx(
+                'flex items-center justify-between gap-4',
+                tableMode ? 'bg-zinc-800 px-4 py-1' : 'bg-zinc-700 px-6 py-4'
+              )}
+            >
               {dateTuple(new Date(date)).map((item, index) => (
                 <span
                   key={index}
-                  className="text-xl font-semibold text-zinc-100"
+                  className={clsx(
+                    'font-semibold ',
+                    tableMode ? 'text-zinc-200' : 'text-xl text-zinc-100'
+                  )}
                 >
                   {item}
                 </span>
               ))}
             </span>
-            <ul className="bg-zinc-600">
+            <ul
+              className={clsx(
+                'bg-zinc-600',
+                tableMode && 'overflow-hidden rounded-lg'
+              )}
+            >
+              {tableMode && (
+                <li className="py-0.5 px-4 even:bg-zinc-700">
+                  <div className="grid grid-cols-4 items-center justify-items-center gap-2">
+                    <span className="text-xs text-zinc-200"></span>
+                    <span className="text-xs text-zinc-200">ммоль/л</span>
+                    <span className="text-xs text-zinc-200">ед</span>
+                    <span className="text-xs text-zinc-200">кг</span>
+                  </div>
+                </li>
+              )}
               {entries
                 .sort((a, b) => a.timePeriod.localeCompare(b.timePeriod))
                 .map((entry) => (
-                  <li key={entry.id} className="px-6 even:bg-zinc-700">
+                  <li
+                    key={entry.id}
+                    className={clsx(
+                      'even:bg-zinc-700',
+                      tableMode ? 'px-4' : 'px-6'
+                    )}
+                  >
                     <DataEntryRow entry={entry} />
                   </li>
                 ))}
