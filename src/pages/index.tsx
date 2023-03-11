@@ -52,6 +52,9 @@ const Home: NextPage = () => {
       <Head>
         <title>Diacates</title>
         <meta name="description" content="Отслеживание глюкозы" />
+        <link rel="manifest" href="/site.webmanifest" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </Head>
       <Header />
       <main className={clsx('grid', !tableMode && 'gap-6')}>
