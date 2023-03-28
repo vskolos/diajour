@@ -119,7 +119,7 @@ const EditEntry: NextPage = () => {
                       .replaceAll(/[^0-9\.]/g, '')
                   )
                 }
-                ref={(input) => input && input.focus()}
+                ref={(input) => !glucoseAmount && input && input.focus()}
               />
             </label>
             <label className="grid grid-cols-4 items-center gap-8 px-6 py-3.5 even:bg-zinc-700">
