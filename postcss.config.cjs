@@ -1,8 +1,7 @@
-const config = {
+module.exports = {
+  map: true,
   plugins: {
     tailwindcss: {},
     autoprefixer: {},
   },
 }
-
-module.exports = config
