@@ -26,14 +26,14 @@
     {#each ticks as tick, index}
       <span
         class={clsx(
-          'text-sm sm:text-base font-bold dark:text-white',
+          'text-sm sm:text-base font-bold dark:text-white transition-colors',
           index % 2 === 1 && 'hidden sm:block'
         )}>{tick}</span
       >
     {/each}
   </div>
   <div
-    class="relative isolate border-s border-neutral-300 dark:border-neutral-600 grid grid-cols-7"
+    class="relative isolate border-s border-neutral-300 dark:border-neutral-600 grid grid-cols-7 transition-colors"
   >
     {#each generateWeekDates($weekStart) as date}
       <DateGroup
@@ -50,7 +50,7 @@
       {#each ticks as _, index}
         <span
           class={clsx(
-            'h-px bg-neutral-300 dark:bg-neutral-600',
+            'h-px bg-neutral-300 dark:bg-neutral-600 transition-colors',
             index % 2 === 1 && 'hidden sm:block'
           )}
         ></span>
