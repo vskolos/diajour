@@ -20,7 +20,7 @@
 </script>
 
 <div
-  class="grid grid-cols-[auto,1fr] grid-rows-[1fr,auto] gap-2 h-[11.5625rem] w-full sm:h-[17.3125rem] md:h-[19.3125rem] p-4 border border-neutral-300 dark:border-neutral-600 rounded-lg"
+  class="grid grid-cols-[auto,1fr] grid-rows-[1fr,auto] gap-2 h-[11.5625rem] w-full sm:h-[17.3125rem] md:h-[19.3125rem] p-4 border border-neutral-300 dark:border-neutral-600 rounded-lg transition-colors"
 >
   <div class="flex flex-col items-end justify-between -my-2.5 sm:-my-3">
     {#each ticks as tick, index}
