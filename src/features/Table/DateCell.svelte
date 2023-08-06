@@ -13,7 +13,8 @@
     class="text-sm md:text-base text-center font-bold dark:text-white transition-colors"
     >{WEEK_DAYS[getDay(date)]}</span
   >
-  <span class="text-xs font-normal md:text-sm text-center text-neutral-400"
+  <span
+    class="text-2xs sm:text-xs font-normal md:text-sm text-center text-neutral-400"
     >{format(date, 'd MMM', {
       locale: ru,
     }).replace('.', '')}</span

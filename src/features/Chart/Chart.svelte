@@ -20,7 +20,7 @@
 </script>
 
 <div
-  class="grid grid-cols-[auto,1fr] grid-rows-[1fr,auto] gap-2 h-48 w-full sm:h-72 md:h-80"
+  class="grid grid-cols-[auto,1fr] grid-rows-[1fr,auto] gap-2 h-[11.5625rem] w-full sm:h-[17.3125rem] md:h-[19.3125rem] p-4 border border-neutral-300 dark:border-neutral-600 rounded-lg"
 >
   <div class="flex flex-col items-end justify-between -my-2.5 sm:-my-3">
     {#each ticks as tick, index}
@@ -66,7 +66,7 @@
           >{WEEK_DAYS[getDay(parse(date, 'dd.MM.yyyy', new Date()))]}</span
         >
         <span
-          class="text-xs font-normal md:text-sm text-center text-neutral-400"
+          class="text-2xs sm:text-xs font-normal md:text-sm text-center text-neutral-400"
           >{format(parse(date, 'dd.MM.yyyy', new Date()), 'd MMM', {
             locale: ru,
           }).replace('.', '')}</span
