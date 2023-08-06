@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   map: true,
   plugins: {
     tailwindcss: {},
