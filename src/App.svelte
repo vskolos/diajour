@@ -2,23 +2,15 @@
   import { addDays, format, isSameWeek, subWeeks } from 'date-fns'
   import ru from 'date-fns/locale/ru'
   import Header from './components/Header.svelte'
+  import ModeSwitcher from './components/ModeSwitcher.svelte'
   import WeekPicker from './components/WeekPicker.svelte'
   import Chart from './features/Chart/Chart.svelte'
   import Table from './features/Table/Table.svelte'
-  import ChartIcon from './icons/ChartIcon.svelte'
   import PlusIcon from './icons/PlusIcon.svelte'
-  import TableIcon from './icons/TableIcon.svelte'
-  import { weekStart } from './stores'
+  import { mode, weekStart } from './stores'
   import { weekData } from './temp/data'
 
   const now = new Date()
-
-  let mode: 'table' | 'chart' = 'table'
-
-  const localStorageMode = localStorage.getItem('mode')
-  if (localStorageMode === 'table' || localStorageMode === 'chart')
-    mode = localStorageMode
-  else localStorage.setItem('mode', mode)
 </script>
 
 <Header />
@@ -70,34 +62,12 @@
           {/if}
         </div>
       </div>
-      <button
-        class="p-2 rounded-lg hover:bg-neutral-300 focus-visible:bg-neutral-300 active:bg-neutral-600 disabled:bg-neutral-600 transition-colors dark:hover:bg-neutral-600 dark:focus-visible:bg-neutral-600 dark:active:bg-neutral-300 dark:disabled:bg-neutral-300 group"
-        disabled={mode === 'table'}
-        on:click={() => {
-          mode = 'table'
-          localStorage.setItem('mode', 'table')
-        }}
-      >
-        <TableIcon
-          class="dark:text-white transition-colors group-disabled:text-white group-active:text-white dark:group-active:text-black dark:group-disabled:text-black"
-        /></button
-      >
-      <button
-        class="p-2 rounded-lg hover:bg-neutral-300 focus-visible:bg-neutral-300 active:bg-neutral-600 disabled:bg-neutral-600 transition-colors dark:hover:bg-neutral-600 dark:focus-visible:bg-neutral-600 dark:active:bg-neutral-300 dark:disabled:bg-neutral-300 group"
-        disabled={mode === 'chart'}
-        on:click={() => {
-          mode = 'chart'
-          localStorage.setItem('mode', 'chart')
-        }}
-        ><ChartIcon
-          class="dark:text-white transition-colors group-disabled:text-white group-active:text-white dark:group-active:text-black dark:group-disabled:text-black"
-        /></button
-      >
+      <ModeSwitcher />
     </div>
 
-    {#if mode === 'table'}
+    {#if $mode === 'table'}
       <Table measurements={weekData.measurements} />
-    {:else if mode === 'chart'}
+    {:else if $mode === 'chart'}
       <Chart measurements={weekData.measurements} />
     {/if}
   </div>
