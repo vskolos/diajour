@@ -9,6 +9,9 @@
   function toggleDarkMode() {
     document.documentElement.classList.toggle('dark')
     darkMode = document.documentElement.classList.contains('dark')
+
+    if (darkMode) localStorage.setItem('theme', 'dark')
+    else localStorage.setItem('theme', 'light')
   }
 </script>
 

@@ -8,9 +8,22 @@
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <script>
+      if (
+        localStorage.getItem('theme') === 'dark' ||
+        (!localStorage.getItem('theme') &&
+          window.matchMedia('(prefers-color-scheme: dark)').matches)
+      )
+        document.documentElement.classList.add('dark')
+      else document.documentElement.classList.remove('dark')
+    </script>
     <script type="module" src="/src/main.ts"></script>
   </head>
-  <body class="bg-neutral-50 transition-colors dark:bg-neutral-900 sm:px-5">
+  <body class="bg-neutral-50 dark:bg-neutral-900 sm:px-5">
     <div id="app"></div>
+    <script>
+      // Prevent the initial flash of light background when the default theme is dark
+      setTimeout(() => document.body.classList.add('transition-colors'), 150)
+    </script>
   </body>
 </html>
