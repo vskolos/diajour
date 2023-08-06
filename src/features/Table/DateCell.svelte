@@ -16,6 +16,6 @@
   <span class="text-xs font-normal md:text-sm text-center text-neutral-400"
     >{format(date, 'd MMM', {
       locale: ru,
-    }).slice(0, -1)}</span
+    }).replace('.', '')}</span
   >
 </th>
