@@ -3,6 +3,7 @@
   import ru from 'date-fns/locale/ru'
   import Header from './components/Header.svelte'
   import WeekPicker from './components/WeekPicker.svelte'
+  import Chart from './features/Chart/Chart.svelte'
   import Table from './features/Table/Table.svelte'
   import ChartIcon from './icons/ChartIcon.svelte'
   import PlusIcon from './icons/PlusIcon.svelte'
@@ -89,8 +90,8 @@
 
     {#if mode === 'table'}
       <Table measurements={weekData.measurements} />
-      <!-- {:else if mode === 'chart'}
-      <Chart measurements={weekData.measurements} /> -->
+    {:else if mode === 'chart'}
+      <Chart measurements={weekData.measurements} />
     {/if}
   </div>
 </main>
