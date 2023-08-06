@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { isSameWeek } from 'date-fns'
+  import { addDays, format, isSameWeek, subWeeks } from 'date-fns'
+  import ru from 'date-fns/locale/ru'
   import Header from './components/Header.svelte'
   import WeekPicker from './components/WeekPicker.svelte'
   import Table from './features/Table/Table.svelte'
@@ -40,7 +41,15 @@
         <h2
           class="text-xl md:text-2xl font-bold dark:text-white transition-colors"
         >
-          {isSameWeek(now, $weekStart) ? 'Текущая неделя' : 'Предыдущая неделя'}
+          {isSameWeek(now, $weekStart, { weekStartsOn: 1 })
+            ? 'Текущая неделя'
+            : isSameWeek(subWeeks(now, 1), $weekStart, { weekStartsOn: 1 })
+            ? 'Предыдущая неделя'
+            : `${format($weekStart, 'd MMMM', { locale: ru })} – ${format(
+                addDays($weekStart, 6),
+                'd MMMM',
+                { locale: ru }
+              )}`}
         </h2>
         <div class="flex items-center gap-2">
           {#if weekData.dosage !== null}
