@@ -14,6 +14,11 @@
   const now = new Date()
 
   let mode: 'table' | 'chart' = 'table'
+
+  const localStorageMode = localStorage.getItem('mode')
+  if (localStorageMode === 'table' || localStorageMode === 'chart')
+    mode = localStorageMode
+  else localStorage.setItem('mode', mode)
 </script>
 
 <Header />
@@ -70,6 +75,7 @@
         disabled={mode === 'table'}
         on:click={() => {
           mode = 'table'
+          localStorage.setItem('mode', 'table')
         }}
       >
         <TableIcon
@@ -81,6 +87,7 @@
         disabled={mode === 'chart'}
         on:click={() => {
           mode = 'chart'
+          localStorage.setItem('mode', 'chart')
         }}
         ><ChartIcon
           class="dark:text-white transition-colors group-disabled:text-white group-active:text-white dark:group-active:text-black dark:group-disabled:text-black"
