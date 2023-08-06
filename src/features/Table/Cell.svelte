@@ -2,7 +2,7 @@
   import clsx from 'clsx'
   import type { WeekData } from '../../types'
 
-  export let measurement: WeekData['measurements'][number]
+  export let measurement: WeekData['measurements'][number] | undefined
 </script>
 
 {#if measurement}
