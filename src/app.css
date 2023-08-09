@@ -44,4 +44,14 @@
       'Helvetica Neue',
       sans-serif;
   }
+
+  input.text-center::-webkit-datetime-edit {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+  }
+
+  select.text-center {
+    text-align-last: center;
+  }
 }

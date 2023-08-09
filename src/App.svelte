@@ -1,6 +1,7 @@
 <script lang="ts">
   import { addDays, format, isSameWeek, subWeeks } from 'date-fns'
   import ru from 'date-fns/locale/ru'
+  import EntryModal from './components/EntryModal.svelte'
   import Header from './components/Header.svelte'
   import ModeSwitcher from './components/ModeSwitcher.svelte'
   import WeekPicker from './components/WeekPicker.svelte'
@@ -11,6 +12,8 @@
   import { weekData } from './temp/data'
 
   const now = new Date()
+
+  let modal: EntryModal
 </script>
 
 <Header />
@@ -20,13 +23,16 @@
     <WeekPicker />
     <button
       class="flex items-center justify-center rounded-xl gap-1 p-4 bg-neutral-600 absolute end-4 bottom-4 sm:end-5 sm:bottom-5 lg:static hover:bg-neutral-700 focus-visible:bg-neutral-700 active:bg-neutral-800 transition-colors dark:bg-neutral-300 dark:hover:bg-neutral-200 dark:focus-visible:bg-neutral-200 dark:active:bg-neutral-100 shadow-[0px_0px_4px_0px] shadow-neutral-600 dark:shadow-neutral-300"
+      on:click={() => modal.open()}
     >
       <PlusIcon class="text-white dark:text-black transition-colors" />
       <span
         class="hidden lg:block text-lg text-white dark:text-black transition-colors"
-        >Добавить замер</span
       >
+        Добавить замер
+      </span>
     </button>
+    <EntryModal bind:this={modal} />
   </aside>
 
   <div
