@@ -10,7 +10,7 @@ if (!process.env.SALT) throw new Error('Add SALT .env variable to proceed')
 if (process.env.PORT && isNaN(parseInt(process.env.PORT)))
   throw new Error('PORT .env variable must be a number')
 
-const port = process.env.PORT ? parseInt(process.env.PORT) : 3000
+const port = process.env.PORT ? parseInt(process.env.PORT) : 3001
 
 const appRouter = router({
   user: userRouter,
