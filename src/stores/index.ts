@@ -9,3 +9,6 @@ export const mode = writable<'table' | 'chart'>(
     ? localStorageMode
     : 'table'
 )
+
+const isLoggedIn = document.cookie.includes('sessionId')
+export const loggedIn = writable(isLoggedIn)

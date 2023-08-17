@@ -1,18 +1,17 @@
 <script lang="ts">
-  import MoonIcon from '../icons/MoonIcon.svelte'
   import PowerIcon from '../icons/PowerIcon.svelte'
-  import SunIcon from '../icons/SunIcon.svelte'
   import UserIcon from '../icons/UserIcon.svelte'
+  import { trpc } from '../main'
+  import { loggedIn } from '../stores'
+  import DarkModeButton from './DarkModeButton.svelte'
 
-  let darkMode = document.documentElement.classList.contains('dark')
+  const user = trpc.user.data.query()
 
-  function toggleDarkMode() {
-    document.documentElement.classList.toggle('dark')
-    darkMode = document.documentElement.classList.contains('dark')
-
-    if (darkMode) localStorage.setItem('theme', 'dark')
-    else localStorage.setItem('theme', 'light')
-  }
+  const logout = trpc.user.logout.mutation({
+    onSuccess: () => {
+      $loggedIn = false
+    },
+  })
 </script>
 
 <header
@@ -33,29 +32,23 @@
     >
   </div>
   <div class="flex items-center gap-2">
-    <span class="font-medium hidden sm:inline dark:text-white transition-colors"
-      >vskolos</span
-    >
+    {#if $user.data}
+      <span
+        class="font-medium hidden sm:inline dark:text-white transition-colors"
+        >{$user.data.username}</span
+      >
+    {/if}
     <button
       class="p-1.5 border-[1.5px] border-neutral-300 rounded-lg hover:bg-neutral-200 focus-visible:bg-neutral-200 active:bg-neutral-300 dark:border-neutral-600 dark:hover:bg-neutral-700 dark:focus-visible:bg-neutral-700 dark:active:bg-neutral-600 transition-colors"
       aria-label="Профиль"
     >
       <UserIcon class="dark:text-white transition-colors" />
     </button>
-    <button
-      class="p-1.5 border-[1.5px] border-neutral-300 rounded-lg hover:bg-neutral-200 focus-visible:bg-neutral-200 active:bg-neutral-300 dark:border-neutral-600 dark:hover:bg-neutral-700 dark:focus-visible:bg-neutral-700 dark:active:bg-neutral-600 transition-colors"
-      aria-label="Темная тема"
-      on:click={toggleDarkMode}
-    >
-      {#if darkMode}
-        <SunIcon class="dark:text-white transition-colors" />
-      {:else}
-        <MoonIcon class="dark:text-white transition-colors" />
-      {/if}
-    </button>
+    <DarkModeButton />
     <button
       class="p-1.5 border-[1.5px] border-neutral-300 rounded-lg hover:bg-neutral-200 focus-visible:bg-neutral-200 active:bg-neutral-300 dark:border-neutral-600 dark:hover:bg-neutral-700 dark:focus-visible:bg-neutral-700 dark:active:bg-neutral-600 transition-colors"
       aria-label="Выйти"
+      on:click={() => $logout.mutate()}
     >
       <PowerIcon class="dark:text-white transition-colors" />
     </button>

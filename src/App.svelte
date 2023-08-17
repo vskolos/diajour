@@ -1,6 +1,8 @@
 <script lang="ts">
+  import { QueryClientProvider } from '@tanstack/svelte-query'
   import { addDays, format, isSameWeek, subWeeks } from 'date-fns'
   import ru from 'date-fns/locale/ru'
+  import AuthForm from './components/AuthForm.svelte'
   import EntryModal from './components/EntryModal.svelte'
   import Header from './components/Header.svelte'
   import ModeSwitcher from './components/ModeSwitcher.svelte'
@@ -8,7 +10,8 @@
   import Chart from './features/Chart/Chart.svelte'
   import Table from './features/Table/Table.svelte'
   import PlusIcon from './icons/PlusIcon.svelte'
-  import { mode, weekStart } from './stores'
+  import { trpc } from './main'
+  import { loggedIn, mode, weekStart } from './stores'
   import { weekData } from './temp/data'
 
   const now = new Date()
@@ -16,65 +19,77 @@
   let modal: EntryModal
 </script>
 
-<Header />
+<QueryClientProvider client={trpc.queryClient}>
+  {#if $loggedIn}
+    <Header />
 
-<main class="grid gap-4 sm:gap-5 py-4 sm:py-5 lg:grid-cols-4 lg:items-start">
-  <aside class="grid gap-4 sm:gap-5">
-    <WeekPicker />
-    <button
-      class="flex items-center justify-center rounded-xl gap-1 p-4 bg-neutral-600 absolute end-4 bottom-4 sm:end-5 sm:bottom-5 lg:static hover:bg-neutral-700 focus-visible:bg-neutral-700 active:bg-neutral-800 transition-colors dark:bg-neutral-300 dark:hover:bg-neutral-200 dark:focus-visible:bg-neutral-200 dark:active:bg-neutral-100 shadow-[0px_0px_4px_0px] shadow-neutral-600 dark:shadow-neutral-300"
-      on:click={() => modal.open()}
+    <main
+      class="grid gap-4 sm:gap-5 py-4 sm:py-5 lg:grid-cols-4 lg:items-start"
     >
-      <PlusIcon class="text-white dark:text-black transition-colors" />
-      <span
-        class="hidden lg:block text-lg text-white dark:text-black transition-colors"
-      >
-        Добавить замер
-      </span>
-    </button>
-    <EntryModal bind:this={modal} />
-  </aside>
-
-  <div
-    class="bg-white rounded-2xl lg:col-span-3 p-4 sm:p-6 grid gap-4 shadow-card dark:bg-neutral-800 dark:shadow-card-dark transition-colors"
-  >
-    <div class="flex gap-2 items-center">
-      <div class="flex gap-y-1 gap-x-2 flex-wrap items-center me-auto">
-        <h2
-          class="text-xl md:text-2xl font-bold dark:text-white transition-colors"
+      <aside class="grid gap-4 sm:gap-5">
+        <WeekPicker />
+        <button
+          class="flex items-center justify-center rounded-xl gap-1 p-4 bg-neutral-600 fixed end-4 bottom-4 sm:end-5 sm:bottom-5 lg:static hover:bg-neutral-700 focus-visible:bg-neutral-700 active:bg-neutral-800 transition-colors dark:bg-neutral-300 dark:hover:bg-neutral-200 dark:focus-visible:bg-neutral-200 dark:active:bg-neutral-100 shadow-[0px_0px_4px_0px] shadow-neutral-600 dark:shadow-neutral-300"
+          on:click={() => modal.open()}
         >
-          {isSameWeek(now, $weekStart, { weekStartsOn: 1 })
-            ? 'Текущая неделя'
-            : isSameWeek(subWeeks(now, 1), $weekStart, { weekStartsOn: 1 })
-            ? 'Предыдущая неделя'
-            : `${format($weekStart, 'd MMMM', { locale: ru })} – ${format(
-                addDays($weekStart, 6),
-                'd MMMM',
-                { locale: ru }
-              )}`}
-        </h2>
-        <div class="flex items-center gap-2">
-          {#if weekData.dosage !== null}
-            <span
-              class="py-1 text-xs px-2 text-center rounded-md bg-neutral-100 transition-colors dark:bg-neutral-900 dark:text-white"
-              >{weekData.dosage} ед</span
-            >
-          {/if}
-          {#if weekData.weight !== null}
-            <span
-              class="py-1 text-xs px-2 text-center rounded-md bg-neutral-100 transition-colors dark:bg-neutral-900 dark:text-white"
-              >{weekData.weight} кг</span
-            >
-          {/if}
-        </div>
-      </div>
-      <ModeSwitcher />
-    </div>
+          <PlusIcon class="text-white dark:text-black transition-colors" />
+          <span
+            class="hidden lg:block text-lg text-white dark:text-black transition-colors"
+          >
+            Добавить замер
+          </span>
+        </button>
+        <EntryModal bind:this={modal} />
+      </aside>
 
-    {#if $mode === 'table'}
-      <Table measurements={weekData.measurements} />
-    {:else if $mode === 'chart'}
-      <Chart measurements={weekData.measurements} />
-    {/if}
-  </div>
-</main>
+      <div
+        class="bg-white rounded-2xl lg:col-span-3 p-4 sm:p-6 grid gap-4 shadow-card dark:bg-neutral-800 dark:shadow-card-dark transition-colors"
+      >
+        <div class="flex gap-2 items-center">
+          <div class="flex gap-y-1 gap-x-2 flex-wrap items-center me-auto">
+            <h2
+              class="text-xl md:text-2xl font-bold dark:text-white transition-colors"
+            >
+              {isSameWeek(now, $weekStart, { weekStartsOn: 1 })
+                ? 'Текущая неделя'
+                : isSameWeek(subWeeks(now, 1), $weekStart, { weekStartsOn: 1 })
+                ? 'Предыдущая неделя'
+                : `${format($weekStart, 'd MMMM', { locale: ru })} – ${format(
+                    addDays($weekStart, 6),
+                    'd MMMM',
+                    { locale: ru }
+                  )}`}
+            </h2>
+            <div class="flex items-center gap-2">
+              {#if weekData.dosage !== null}
+                <span
+                  class="py-1 text-xs px-2 text-center rounded-md bg-neutral-100 transition-colors dark:bg-neutral-900 dark:text-white"
+                  >{weekData.dosage} ед</span
+                >
+              {/if}
+              {#if weekData.weight !== null}
+                <span
+                  class="py-1 text-xs px-2 text-center rounded-md bg-neutral-100 transition-colors dark:bg-neutral-900 dark:text-white"
+                  >{weekData.weight} кг</span
+                >
+              {/if}
+            </div>
+          </div>
+          <ModeSwitcher />
+        </div>
+
+        {#if $mode === 'table'}
+          <Table measurements={weekData.measurements} />
+        {:else if $mode === 'chart'}
+          <Chart measurements={weekData.measurements} />
+        {/if}
+      </div>
+    </main>
+  {:else}
+    <main
+      class="grid gap-4 sm:gap-5 min-h-full place-items-center py-4 sm:py-5"
+    >
+      <AuthForm />
+    </main>
+  {/if}
+</QueryClientProvider>
