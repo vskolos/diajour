@@ -25,10 +25,10 @@
   />
   <div class="grid me-auto">
     <h1 class="text-lg font-bold dark:text-white transition-colors">
-      Diacates
+      Кот Диажур
     </h1>
     <span class="text-xs text-neutral-400"
-      >Дневник замеров <span class="hidden sm:inline">глюкозы</span></span
+      >Журнал замеров <span class="hidden sm:inline">глюкозы</span></span
     >
   </div>
   <div class="flex items-center gap-2">

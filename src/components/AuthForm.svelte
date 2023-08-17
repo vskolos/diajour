@@ -28,9 +28,9 @@
   <div class="flex items-center gap-2 justify-between">
     <div class="grid">
       <h3 class="text-2xl font-bold dark:text-white transition-colors">
-        Diacates
+        Кот Диажур
       </h3>
-      <span class="text-neutral-400"> Дневник замеров глюкозы </span>
+      <span class="text-neutral-400">Журнал замеров глюкозы</span>
     </div>
     <DarkModeButton />
   </div>
