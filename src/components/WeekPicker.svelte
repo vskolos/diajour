@@ -27,19 +27,19 @@
   class="bg-white md:grid md:grid-cols-3 lg:grid-cols-1 rounded-2xl p-3 flex flex-wrap gap-2 items-center shadow-card dark:bg-neutral-800 dark:shadow-card-dark transition-colors"
 >
   <button
-    class="text-center px-3 py-2 flex-grow rounded-lg hover:bg-neutral-300 focus-visible:bg-neutral-300 active:bg-neutral-600 disabled:bg-neutral-600 disabled:text-white transition-colors active:text-white dark:text-white dark:hover:bg-neutral-600 dark:focus-visible:bg-neutral-600 dark:active:bg-neutral-300 dark:disabled:bg-neutral-300 dark:active:text-black dark:disabled:text-black"
-    disabled={isSameWeek(now, $weekStart, { weekStartsOn: 1 })}
-    on:click={() => weekStart.set(startOfWeek(now, { weekStartsOn: 1 }))}
-    >Текущая <span class="hidden sm:inline">неделя</span></button
-  >
-  <button
-    class="text-center px-3 py-2 flex-grow rounded-lg hover:bg-neutral-300 focus-visible:bg-neutral-300 active:bg-neutral-600 disabled:bg-neutral-600 disabled:text-white transition-colors active:text-white dark:text-white dark:hover:bg-neutral-600 dark:focus-visible:bg-neutral-600 dark:active:bg-neutral-300 dark:disabled:bg-neutral-300 dark:active:text-black dark:disabled:text-black"
+    class="text-center px-3 py-2 flex-grow rounded-lg hover:bg-neutral-300 focus-visible:bg-neutral-300 active:bg-neutral-600 disabled:bg-neutral-600 disabled:text-white transition-colors active:text-white dark:text-white dark:hover:bg-neutral-600 dark:focus-visible:bg-neutral-600 dark:active:bg-neutral-300 dark:disabled:bg-neutral-300 dark:active:text-black dark:disabled:text-black lg:order-2"
     disabled={isSameWeek(subWeeks(now, 1), $weekStart, { weekStartsOn: 1 })}
     on:click={() =>
       weekStart.set(startOfWeek(subWeeks(now, 1), { weekStartsOn: 1 }))}
     >Предыдущая <span class="hidden sm:inline">неделя</span></button
   >
-  <div class="flex items-center gap-2 flex-grow">
+  <button
+    class="text-center px-3 py-2 flex-grow rounded-lg hover:bg-neutral-300 focus-visible:bg-neutral-300 active:bg-neutral-600 disabled:bg-neutral-600 disabled:text-white transition-colors active:text-white dark:text-white dark:hover:bg-neutral-600 dark:focus-visible:bg-neutral-600 dark:active:bg-neutral-300 dark:disabled:bg-neutral-300 dark:active:text-black dark:disabled:text-black lg:order-1"
+    disabled={isSameWeek(now, $weekStart, { weekStartsOn: 1 })}
+    on:click={() => weekStart.set(startOfWeek(now, { weekStartsOn: 1 }))}
+    >Текущая <span class="hidden sm:inline">неделя</span></button
+  >
+  <div class="flex items-center gap-2 flex-grow lg:order-3">
     <button
       class="p-1.5 border-[1.5px] border-neutral-300 rounded-lg hover:bg-neutral-200 focus-visible:bg-neutral-200 active:bg-neutral-300 dark:border-neutral-600 dark:hover:bg-neutral-700 dark:focus-visible:bg-neutral-700 dark:active:bg-neutral-600 transition-[color,background-color,border-color,text-decoration-color,fill,stroke,opacity] disabled:pointer-events-none disabled:opacity-50"
       aria-label="Профиль"
