@@ -6,7 +6,7 @@ import './app.css'
 export const trpc = createTRPCSvelte<AppRouter>({
   links: [
     httpBatchLink({
-      url: import.meta.env.DEV ? 'http://localhost:3000' : '/trpc',
+      url: import.meta.env.DEV ? 'http://localhost:3001' : '/trpc',
       fetch: import.meta.env.DEV
         ? (url, options) =>
             fetch(url, {
