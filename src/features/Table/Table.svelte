@@ -7,7 +7,7 @@
   import Cell from './Cell.svelte'
   import DateCell from './DateCell.svelte'
 
-  export let measurements: WeekData['measurements']
+  export let entries: WeekData['entries']
 </script>
 
 <table
@@ -81,9 +81,8 @@
         {/if}
         {#each generateWeekDates($weekStart) as date}
           <Cell
-            measurement={measurements.find(
-              (measurement) =>
-                measurement.date === date && measurement.period === period
+            entry={entries.find(
+              (entry) => entry.date === date && entry.period === period
             )}
           />
         {/each}

@@ -79,9 +79,9 @@
         </div>
 
         {#if $mode === 'table'}
-          <Table measurements={weekData.measurements} />
+          <Table entries={weekData.entries} />
         {:else if $mode === 'chart'}
-          <Chart measurements={weekData.measurements} />
+          <Chart entries={weekData.entries} />
         {/if}
       </div>
     </main>

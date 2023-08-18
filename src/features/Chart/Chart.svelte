@@ -8,10 +8,10 @@
   import { generateWeekDates } from '../../utils'
   import DateGroup from './DateGroup.svelte'
 
-  export let measurements: WeekData['measurements']
+  export let entries: WeekData['entries']
 
-  let maxGlucoseLevel = measurements
-    .map((measurement) => measurement.glucose)
+  let maxGlucoseLevel = entries
+    .map((entry) => entry.glucose)
     .reduce((prev, curr) => (curr > prev ? curr : prev))
 
   let ticks = GLUCOSE_LEVEL_TICKS.filter(
@@ -37,9 +37,7 @@
   >
     {#each generateWeekDates($weekStart) as date}
       <DateGroup
-        measurements={measurements.filter(
-          (measurement) => measurement.date === date
-        )}
+        entries={entries.filter((entry) => entry.date === date)}
         maxTickValue={ticks[0]}
       />
     {/each}
