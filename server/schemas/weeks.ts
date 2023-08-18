@@ -1,5 +1,7 @@
-import { sql, type InferModel } from 'drizzle-orm'
+import { sql } from 'drizzle-orm'
 import { integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core'
+import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
+import type { z } from 'zod'
 
 export const weeks = sqliteTable('weeks', {
   id: integer('id').primaryKey({ autoIncrement: true }),
@@ -16,8 +18,8 @@ export const weeks = sqliteTable('weeks', {
     .notNull(),
 })
 
-// export const weeksRelations = relations(weeks, ({ many }) => ({
-//   entries: many(entries),
-// }))
+export const Week = createSelectSchema(weeks)
+export const InsertWeek = createInsertSchema(weeks)
 
-export type Week = InferModel<typeof weeks>
+export type Week = z.infer<typeof Week>
+export type InsertWeek = z.infer<typeof InsertWeek>
