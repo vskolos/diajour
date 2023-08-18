@@ -20,7 +20,7 @@ const appRouter = router({
 const handler = createHTTPHandler({
   router: appRouter,
   middleware:
-    process.env.NODE_ENV === 'dev'
+    process.env.NODE_ENV === 'development'
       ? (req, res, next) => {
           res.setHeader('Access-Control-Allow-Credentials', 'true')
           cors({

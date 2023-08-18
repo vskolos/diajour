@@ -119,7 +119,7 @@ export const userRouter = router({
       ctx.setCookie(
         'sessionId',
         session.id,
-        process.env.NODE_ENV === 'dev'
+        process.env.NODE_ENV === 'development'
           ? {
               sameSite: 'none',
               secure: true,
@@ -139,7 +139,7 @@ export const userRouter = router({
     ctx.setCookie(
       'sessionId',
       '',
-      process.env.NODE_ENV === 'dev'
+      process.env.NODE_ENV === 'development'
         ? { sameSite: 'none', secure: true, expires: new Date(0) }
         : { expires: new Date(0) }
     )
