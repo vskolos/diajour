@@ -1,5 +1,6 @@
 import { TRPCError } from '@trpc/server'
 import crypto from 'crypto'
+import { addDays } from 'date-fns'
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 import { db } from '../db'
@@ -119,8 +120,8 @@ export const userRouter = router({
         'sessionId',
         session.id,
         process.env.NODE_ENV === 'dev'
-          ? { sameSite: 'none', secure: true }
-          : undefined
+          ? { sameSite: 'none', secure: true, expires: addDays(new Date(), 1) }
+          : { expires: addDays(new Date(), 1) }
       )
     }),
 
@@ -130,10 +131,12 @@ export const userRouter = router({
 
     db.delete(sessions).where(eq(sessions.id, sessionId)).run()
 
-    ctx.setCookie('sessionId', '', {
-      sameSite: 'none',
-      secure: true,
-      expires: new Date(0),
-    })
+    ctx.setCookie(
+      'sessionId',
+      '',
+      process.env.NODE_ENV === 'dev'
+        ? { sameSite: 'none', secure: true, expires: new Date(0) }
+        : { expires: new Date(0) }
+    )
   }),
 })
