@@ -120,8 +120,13 @@ export const userRouter = router({
         'sessionId',
         session.id,
         process.env.NODE_ENV === 'dev'
-          ? { sameSite: 'none', secure: true, expires: addDays(new Date(), 1) }
-          : { expires: addDays(new Date(), 1) }
+          ? {
+              sameSite: 'none',
+              secure: true,
+              expires: addDays(new Date(), 1),
+              path: '/',
+            }
+          : { expires: addDays(new Date(), 1), path: '/' }
       )
     }),
 
