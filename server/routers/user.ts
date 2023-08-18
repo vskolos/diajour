@@ -141,7 +141,7 @@ export const userRouter = router({
       )
     }),
 
-  logout: publicProcedure.mutation(({ ctx }) => {
+  logout: authedProcedure.mutation(({ ctx }) => {
     const sessionId = ctx.sessionId
 
     if (!sessionId)
