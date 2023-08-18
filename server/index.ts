@@ -1,6 +1,7 @@
-import { createHTTPServer } from '@trpc/server/adapters/standalone'
+import { createHTTPHandler } from '@trpc/server/adapters/standalone'
 import cors from 'cors'
 import dotenv from 'dotenv'
+import { createServer } from 'http'
 import { userRouter } from './routers'
 import { createContext, router } from './trpc'
 
@@ -16,7 +17,7 @@ const appRouter = router({
   user: userRouter,
 })
 
-const server = createHTTPServer({
+const handler = createHTTPHandler({
   router: appRouter,
   middleware:
     process.env.NODE_ENV === 'dev'
@@ -28,6 +29,11 @@ const server = createHTTPServer({
         }
       : undefined,
   createContext,
+})
+
+const server = createServer((req, res) => {
+  req.url = req.url?.replace('/trpc', '')
+  handler(req, res)
 })
 
 server.listen(port)
