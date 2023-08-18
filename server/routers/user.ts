@@ -10,7 +10,13 @@ import { PASSWORD_REGEX, hashPassword } from '../utils'
 
 export const userRouter = router({
   data: authedProcedure.query(({ ctx }) => {
-    const sessionId = ctx.sessionId!
+    const sessionId = ctx.sessionId
+
+    if (!sessionId)
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Не найдена активная сессия',
+      })
 
     const user = db
       .select()
@@ -19,8 +25,15 @@ export const userRouter = router({
       .where(eq(sessions.id, sessionId))
       .get()?.users
 
-    return user
+    if (!user)
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: 'Не найден пользователь активной сесии',
+      })
+
+    return { username: user.username, avatar: user.avatar }
   }),
+
   signup: publicProcedure
     .input(z.object({ username: z.string(), password: z.string() }))
     .mutation(({ input }) => {
@@ -60,8 +73,6 @@ export const userRouter = router({
           password: hashPassword(input.password),
         })
         .run()
-
-      return db.select().from(users).all()
     }),
 
   login: publicProcedure
@@ -131,8 +142,13 @@ export const userRouter = router({
     }),
 
   logout: publicProcedure.mutation(({ ctx }) => {
-    const sessionId = ctx.getCookie('sessionId')
-    if (!sessionId) return
+    const sessionId = ctx.sessionId
+
+    if (!sessionId)
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Не найдена активная сессия',
+      })
 
     db.delete(sessions).where(eq(sessions.id, sessionId)).run()
 
