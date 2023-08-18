@@ -2,9 +2,8 @@ import { TRPCError } from '@trpc/server'
 import crypto from 'crypto'
 import { addDays } from 'date-fns'
 import { eq } from 'drizzle-orm'
-import { z } from 'zod'
 import { db } from '../db'
-import { sessions, users } from '../schemas'
+import { InsertUser, User, sessions, users } from '../schemas'
 import { authedProcedure, publicProcedure, router } from '../trpc'
 import { PASSWORD_REGEX, hashPassword } from '../utils'
 
@@ -34,49 +33,47 @@ export const userRouter = router({
     return { username: user.username, avatar: user.avatar }
   }),
 
-  signup: publicProcedure
-    .input(z.object({ username: z.string(), password: z.string() }))
-    .mutation(({ input }) => {
-      if (!input.username)
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'Не указано имя пользователя',
-        })
+  signup: publicProcedure.input(InsertUser).mutation(({ input }) => {
+    if (!input.username)
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'Не указано имя пользователя',
+      })
 
-      if (!input.password)
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'Не указан пароль',
-        })
+    if (!input.password)
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'Не указан пароль',
+      })
 
-      const user = db
-        .select()
-        .from(users)
-        .where(eq(users.username, input.username))
-        .get()
+    const user = db
+      .select()
+      .from(users)
+      .where(eq(users.username, input.username))
+      .get()
 
-      if (user)
-        throw new TRPCError({
-          code: 'CONFLICT',
-          message: 'Пользователь уже существует',
-        })
+    if (user)
+      throw new TRPCError({
+        code: 'CONFLICT',
+        message: 'Пользователь уже существует',
+      })
 
-      if (!PASSWORD_REGEX.test(input.password))
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'Пароль слишком простой',
-        })
+    if (!PASSWORD_REGEX.test(input.password))
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'Пароль слишком простой',
+      })
 
-      db.insert(users)
-        .values({
-          username: input.username,
-          password: hashPassword(input.password),
-        })
-        .run()
-    }),
+    db.insert(users)
+      .values({
+        username: input.username,
+        password: hashPassword(input.password),
+      })
+      .run()
+  }),
 
   login: publicProcedure
-    .input(z.object({ username: z.string(), password: z.string() }))
+    .input(User.pick({ username: true, password: true }))
     .mutation(async ({ input, ctx }) => {
       if (ctx.getCookie('sessionId')) return
 
