@@ -134,8 +134,8 @@ export const userRouter = router({
       'sessionId',
       '',
       process.env.NODE_ENV === 'development'
-        ? { sameSite: 'none', secure: true, expires: new Date(0) }
-        : { expires: new Date(0) }
+        ? { sameSite: 'none', secure: true, expires: new Date(0), path: '/' }
+        : { expires: new Date(0), path: '/' }
     )
   }),
 })
