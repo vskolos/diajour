@@ -67,7 +67,7 @@
     error = ''
     if (!glucose) return (error = 'Введите уровень глюкозы')
 
-    const parsedGlucose = parseFloat(glucose)
+    const parsedGlucose = parseFloat(glucose.replaceAll(',', '.'))
     if (!parsedGlucose) return (error = 'Введите корректное число')
 
     if (entry) $updateEntry.mutate({ date, timePeriod, glucose: parsedGlucose })
