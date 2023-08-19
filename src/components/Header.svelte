@@ -5,7 +5,7 @@
   import { loggedIn } from '../stores'
   import DarkModeButton from './DarkModeButton.svelte'
 
-  const user = trpc.user.data.query()
+  $: user = trpc.user.data.query()
 
   const logout = trpc.user.logout.mutation({
     onSuccess: () => {

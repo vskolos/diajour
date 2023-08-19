@@ -5,7 +5,7 @@
   export let entries: WeekData['entries']
   export let maxTickValue: number
 
-  if (entries.length === 0)
+  $: if (entries.length === 0)
     entries.push({ date: '', period: 'midday', glucose: 0 })
 </script>
 

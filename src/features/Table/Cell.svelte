@@ -1,6 +1,9 @@
 <script lang="ts">
   import clsx from 'clsx'
+  import EntryModal from '../../components/EntryModal.svelte'
   import type { WeekData } from '../../types'
+
+  let modal: EntryModal
 
   export let entry: WeekData['entries'][number] | undefined
 </script>
@@ -9,7 +12,8 @@
   <td
     class="grid py-2 sm:py-4 items-center border-e border-e-neutral-300 dark:border-e-neutral-600 transition-colors last:border-e-0"
   >
-    <span
+    <button
+      on:click={modal.open}
       class={clsx(
         'text-lg text-center font-bold sm:text-2xl md:text-3xl transition-colors',
         entry.glucose < 2
@@ -21,8 +25,9 @@
           : entry.glucose < 28
           ? 'text-sky-500 dark:text-sky-600'
           : 'text-purple-500 dark:text-purple-600'
-      )}>{entry.glucose}</span
+      )}>{entry.glucose}</button
     >
+    <EntryModal bind:this={modal} {entry} />
   </td>
 {:else}
   <td

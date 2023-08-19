@@ -3,33 +3,14 @@ import crypto from 'crypto'
 import { addDays } from 'date-fns'
 import { eq } from 'drizzle-orm'
 import { db } from '../db'
+import { getUserBySessionId } from '../helpers'
 import { InsertUser, User, sessions, users } from '../schemas'
 import { authedProcedure, publicProcedure, router } from '../trpc'
 import { PASSWORD_REGEX, hashPassword } from '../utils'
 
 export const userRouter = router({
   data: authedProcedure.query(({ ctx }) => {
-    const sessionId = ctx.sessionId
-
-    if (!sessionId)
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: 'Не найдена активная сессия',
-      })
-
-    const user = db
-      .select()
-      .from(users)
-      .innerJoin(sessions, eq(users.id, sessions.userId))
-      .where(eq(sessions.id, sessionId))
-      .get()?.users
-
-    if (!user)
-      throw new TRPCError({
-        code: 'NOT_FOUND',
-        message: 'Не найден пользователь активной сесии',
-      })
-
+    const user = getUserBySessionId(ctx.sessionId)
     return { username: user.username, avatar: user.avatar }
   }),
 

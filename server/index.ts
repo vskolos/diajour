@@ -2,7 +2,7 @@ import { createHTTPHandler } from '@trpc/server/adapters/standalone'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import { createServer } from 'http'
-import { userRouter } from './routers'
+import { entryRouter, userRouter } from './routers'
 import { createContext, router } from './trpc'
 
 dotenv.config()
@@ -14,6 +14,7 @@ if (process.env.PORT && isNaN(parseInt(process.env.PORT)))
 const port = process.env.PORT ? parseInt(process.env.PORT) : 3001
 
 const appRouter = router({
+  entries: entryRouter,
   user: userRouter,
 })
 

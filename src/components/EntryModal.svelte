@@ -1,40 +1,82 @@
 <script lang="ts">
   import clsx from 'clsx'
-  import { format } from 'date-fns'
+  import { format, parse, startOfWeek } from 'date-fns'
   import ru from 'date-fns/locale/ru'
+  import TrashIcon from '../icons/TrashIcon.svelte'
   import XMarkIcon from '../icons/XMarkIcon.svelte'
-  import type { TimePeriod } from '../types'
+  import { trpc } from '../main'
+  import type { TimePeriod, WeekData } from '../types'
   import Modal from './Modal.svelte'
 
   let modal: Modal
 
   export const open = () => modal.open()
+  export let entry: WeekData['entries'][number] | undefined = undefined
 
   let date: string
   let timePeriod: TimePeriod
   let glucose: string
   let error: string
 
+  function invalidateEntryListAndCloseModal(date: string) {
+    trpc.entries.list.utils.invalidate({
+      weekStart: format(
+        startOfWeek(parse(date, 'yyyy-MM-dd', new Date()), {
+          weekStartsOn: 1,
+        }),
+        'yyyy-MM-dd'
+      ),
+    })
+    modal.close()
+  }
+
+  const createEntry = trpc.entries.create.mutation({
+    onSuccess: () => invalidateEntryListAndCloseModal(date),
+  })
+
+  const updateEntry = trpc.entries.update.mutation({
+    onSuccess: () => invalidateEntryListAndCloseModal(date),
+  })
+
+  const deleteEntry = trpc.entries.delete.mutation({
+    onSuccess: () => invalidateEntryListAndCloseModal(date),
+  })
+
   function setDefaults() {
     const now = new Date()
     const currentHour = now.getHours()
 
-    date = format(now, 'yyyy-MM-dd', { locale: ru })
-    timePeriod =
-      currentHour < 12 ? 'morning' : currentHour < 18 ? 'midday' : 'evening'
-    glucose = ''
+    date = entry ? entry.date : format(now, 'yyyy-MM-dd', { locale: ru })
+    timePeriod = entry
+      ? entry.period
+      : currentHour < 12
+      ? 'morning'
+      : currentHour < 18
+      ? 'midday'
+      : 'evening'
+    glucose = entry ? `${entry.glucose}` : ''
     error = ''
+
+    $createEntry.reset()
+    $updateEntry.reset()
   }
 
   setDefaults()
 
   function handleSubmit() {
-    if (!glucose) {
-      error = 'Введите показания глюкозы'
-      return
-    }
+    error = ''
+    if (!glucose) return (error = 'Введите уровень глюкозы')
 
-    modal.close()
+    const parsedGlucose = parseFloat(glucose)
+    if (!parsedGlucose) return (error = 'Введите корректное число')
+
+    if (entry) $updateEntry.mutate({ date, timePeriod, glucose: parsedGlucose })
+    else $createEntry.mutate({ date, timePeriod, glucose: parsedGlucose })
+  }
+
+  function handleDelete() {
+    if (!entry) return (error = 'Невозможно удалить запись')
+    $deleteEntry.mutate({ id: entry.id })
   }
 </script>
 
@@ -44,19 +86,11 @@
     on:submit|preventDefault={handleSubmit}
   >
     <div class="flex items-center justify-between gap-2">
-      <div class="grid">
-        <h3
-          class="text-xl md:text-2xl font-bold dark:text-white transition-colors"
-        >
-          Добавить замер
-        </h3>
-
-        {#if error}
-          <div class="text-xs md:text-sm text-red-500 dark:text-red-600">
-            {error}
-          </div>
-        {/if}
-      </div>
+      <h3
+        class="text-xl md:text-2xl font-bold dark:text-white transition-colors"
+      >
+        {entry ? 'Изменить замер' : 'Добавить замер'}
+      </h3>
       <button
         type="button"
         class="p-2 rounded-lg hover:bg-neutral-300 focus-visible:bg-neutral-300 active:bg-neutral-600 transition-colors dark:hover:bg-neutral-600 dark:focus-visible:bg-neutral-600 dark:active:bg-neutral-300 group"
@@ -75,13 +109,13 @@
           class="grid grid-cols-2 border-b border-b-neutral-300 dark:border-b-neutral-600 last:border-b-0"
         >
           <td
-            class="grid p-2 place-items-center font-medium border-e border-e-neutral-300 dark:border-e-neutral-600 text-black dark:text-white"
+            class="grid p-2 place-items-center font-medium border-e border-e-neutral-300 dark:border-e-neutral-600 text-black dark:text-white transition-colors"
           >
             Дата
           </td>
           <td class="grid">
             <input
-              class="flex px-2 appearance-none bg-transparent text-black dark:text-white dark:[color-scheme:dark] text-center cursor-pointer"
+              class="flex px-2 appearance-none bg-transparent text-black dark:text-white dark:[color-scheme:dark] text-center cursor-pointer transition-colors"
               type="date"
               bind:value={date}
             />
@@ -91,14 +125,14 @@
           class="grid grid-cols-2 border-b border-b-neutral-300 dark:border-b-neutral-600 last:border-b-0"
         >
           <td
-            class="grid p-2 place-items-center font-medium border-e border-e-neutral-300 dark:border-e-neutral-600 text-black dark:text-white"
+            class="grid p-2 place-items-center font-medium border-e border-e-neutral-300 dark:border-e-neutral-600 text-black dark:text-white transition-colors"
           >
             Период
           </td>
           <td class="grid">
             <select
               bind:value={timePeriod}
-              class="px-2 appearance-none bg-transparent text-black dark:text-white dark:[color-scheme:dark] text-center w-full cursor-pointer"
+              class="px-2 appearance-none bg-transparent text-black dark:text-white dark:[color-scheme:dark] text-center w-full cursor-pointer transition-colors"
             >
               <option value="morning">Утро</option>
               <option value="midday">День</option>
@@ -118,7 +152,7 @@
             <input
               bind:value={glucose}
               class={clsx(
-                'px-2 bg-transparent w-full text-black dark:text-white dark:[color-scheme:dark] text-center placeholder:text-neutral-400',
+                'px-2 bg-transparent w-full text-black dark:text-white dark:[color-scheme:dark] text-center placeholder:text-neutral-400 transition-colors placeholder:transition-colors',
                 error &&
                   'placeholder:text-red-500 dark:placeholder:text-red-600'
               )}
@@ -130,13 +164,45 @@
         </tr>
       </tbody>
     </table>
-    <button
-      type="submit"
-      class="flex items-center justify-center rounded-lg md:rounded-xl py-2 px-3 md:p-4 bg-neutral-600 hover:bg-neutral-700 focus-visible:bg-neutral-700 active:bg-neutral-800 transition-colors dark:bg-neutral-300 dark:hover:bg-neutral-200 dark:focus-visible:bg-neutral-200 dark:active:bg-neutral-100"
-    >
-      <span class="md:text-lg text-white dark:text-black transition-colors">
-        Сохранить
-      </span>
-    </button>
+    <div class="flex items-center gap-2">
+      {#if entry}
+        <button
+          type="button"
+          on:click={handleDelete}
+          class="flex flex-shrink-0 items-center justify-center rounded-xl p-4 bg-red-600 hover:bg-red-700 focus-visible:bg-red-700 active:bg-red-800 transition-colors dark:bg-red-300 dark:hover:bg-red-200 dark:focus-visible:bg-red-200 dark:active:bg-red-100"
+        >
+          <TrashIcon class="text-white dark:text-black transition-colors" />
+        </button>
+      {/if}
+      <button
+        type="submit"
+        class="flex flex-grow items-center justify-center rounded-xl p-4 bg-neutral-600 hover:bg-neutral-700 focus-visible:bg-neutral-700 active:bg-neutral-800 transition-colors dark:bg-neutral-300 dark:hover:bg-neutral-200 dark:focus-visible:bg-neutral-200 dark:active:bg-neutral-100"
+      >
+        <span class="text-white dark:text-black transition-colors font-medium">
+          Сохранить
+        </span>
+      </button>
+    </div>
+    {#if error}
+      <div
+        class="text-sm text-center text-red-500 dark:text-red-600 transition-colors"
+      >
+        {error}
+      </div>
+    {/if}
+    {#if $createEntry.error}
+      <div
+        class="text-sm text-center text-red-500 dark:text-red-600 transition-colors"
+      >
+        {$createEntry.error.message}
+      </div>
+    {/if}
+    {#if $updateEntry.error}
+      <div
+        class="text-sm text-center text-red-500 dark:text-red-600 transition-colors"
+      >
+        {$updateEntry.error.message}
+      </div>
+    {/if}
   </form>
 </Modal>

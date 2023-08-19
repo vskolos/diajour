@@ -1,13 +1,15 @@
 <script lang="ts">
-  import { parse } from 'date-fns'
-  import { DAY_PERIODS } from '../../constants'
+  import { format, parse } from 'date-fns'
+  import { TIME_PERIODS } from '../../constants'
+  import { trpc } from '../../main'
   import { weekStart } from '../../stores'
-  import type { WeekData } from '../../types'
   import { generateWeekDates } from '../../utils'
   import Cell from './Cell.svelte'
   import DateCell from './DateCell.svelte'
 
-  export let entries: WeekData['entries']
+  $: week = trpc.entries.list.query({
+    weekStart: format($weekStart, 'yyyy-MM-dd'),
+  })
 </script>
 
 <table
@@ -30,12 +32,12 @@
         >
       </th>
       {#each generateWeekDates($weekStart) as date}
-        <DateCell date={parse(date, 'dd.MM.yyyy', new Date())} />
+        <DateCell date={parse(date, 'yyyy-MM-dd', new Date())} />
       {/each}
     </tr>
   </thead>
   <tbody class="grid">
-    {#each DAY_PERIODS as period}
+    {#each TIME_PERIODS as period}
       <tr
         class="grid grid-cols-8 border-b border-b-neutral-300 dark:border-b-neutral-600 transition-colors last:border-b-0"
       >
@@ -81,7 +83,7 @@
         {/if}
         {#each generateWeekDates($weekStart) as date}
           <Cell
-            entry={entries.find(
+            entry={$week.data?.entries.find(
               (entry) => entry.date === date && entry.period === period
             )}
           />

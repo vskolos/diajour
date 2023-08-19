@@ -3,19 +3,25 @@
   import { format, getDay, parse } from 'date-fns'
   import ru from 'date-fns/locale/ru'
   import { GLUCOSE_LEVEL_TICKS, WEEK_DAYS } from '../../constants'
+  import { trpc } from '../../main'
   import { weekStart } from '../../stores'
-  import type { WeekData } from '../../types'
   import { generateWeekDates } from '../../utils'
   import DateGroup from './DateGroup.svelte'
 
-  export let entries: WeekData['entries']
+  $: week = trpc.entries.list.query({
+    weekStart: format($weekStart, 'yyyy-MM-dd'),
+  })
 
-  let maxGlucoseLevel = entries
-    .map((entry) => entry.glucose)
-    .reduce((prev, curr) => (curr > prev ? curr : prev))
+  $: maxGlucoseLevel =
+    $week.data?.entries
+      .map((entry) => entry.glucose)
+      .reduce(
+        (prev, curr) => (curr > prev ? curr : prev),
+        GLUCOSE_LEVEL_TICKS[0]
+      ) ?? GLUCOSE_LEVEL_TICKS[0]
 
-  let ticks = GLUCOSE_LEVEL_TICKS.filter(
-    (level) => maxGlucoseLevel > 30 || level > maxGlucoseLevel
+  $: ticks = GLUCOSE_LEVEL_TICKS.filter(
+    (level) => maxGlucoseLevel > 30 || level < maxGlucoseLevel
   )
 </script>
 
@@ -37,7 +43,8 @@
   >
     {#each generateWeekDates($weekStart) as date}
       <DateGroup
-        entries={entries.filter((entry) => entry.date === date)}
+        entries={$week.data?.entries.filter((entry) => entry.date === date) ??
+          []}
         maxTickValue={ticks[0]}
       />
     {/each}
@@ -61,11 +68,11 @@
       <div class="grid items-center">
         <span
           class="text-sm md:text-base text-center font-bold dark:text-white transition-colors"
-          >{WEEK_DAYS[getDay(parse(date, 'dd.MM.yyyy', new Date()))]}</span
+          >{WEEK_DAYS[getDay(parse(date, 'yyyy-MM-dd', new Date()))]}</span
         >
         <span
           class="text-2xs sm:text-xs font-normal md:text-sm text-center text-neutral-400"
-          >{format(parse(date, 'dd.MM.yyyy', new Date()), 'd MMM', {
+          >{format(parse(date, 'yyyy-MM-dd', new Date()), 'd MMM', {
             locale: ru,
           }).replace('.', '')}</span
         >

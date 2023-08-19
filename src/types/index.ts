@@ -4,6 +4,7 @@ export type WeekData = {
   dosage: number | null
   weight: number | null
   entries: {
+    id: number
     date: string
     period: TimePeriod
     glucose: number
