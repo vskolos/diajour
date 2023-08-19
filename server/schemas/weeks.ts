@@ -5,16 +5,17 @@ import type { z } from 'zod'
 
 export const weeks = sqliteTable('weeks', {
   id: integer('id').primaryKey({ autoIncrement: true }),
+  userId: integer('user_id').notNull(),
 
   start: text('start').notNull(),
   dosage: real('dosage'),
   weight: real('weight'),
 
   createdAt: text('created_at')
-    .default(sql`CURRENT_DATE`)
+    .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
   updatedAt: text('updated_at')
-    .default(sql`CURRENT_DATE`)
+    .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
 })
 
