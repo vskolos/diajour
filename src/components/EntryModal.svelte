@@ -157,7 +157,7 @@
                   'placeholder:text-red-500 dark:placeholder:text-red-600'
               )}
               type="text"
-              inputmode="numeric"
+              inputmode="decimal"
               placeholder="15.5"
             />
           </td>
