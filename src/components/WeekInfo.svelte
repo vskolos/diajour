@@ -35,28 +35,26 @@
           { locale: ru }
         )}`}
   </h2>
-  {#if $week.data}
-    <div class="flex items-center gap-2">
-      <DataBadge
-        label="дозировка"
-        value={$week.data.dosage ? `${$week.data.dosage}` : ''}
-        unit="ед"
-        on:submit={(event) =>
-          $updateWeek.mutate({
-            start: format($weekStart, 'yyyy-MM-dd'),
-            dosage: event.detail.value,
-          })}
-      />
-      <DataBadge
-        label="вес"
-        value={$week.data.weight ? `${$week.data.weight}` : ''}
-        unit="кг"
-        on:submit={(event) =>
-          $updateWeek.mutate({
-            start: format($weekStart, 'yyyy-MM-dd'),
-            weight: event.detail.value,
-          })}
-      />
-    </div>
-  {/if}
+  <div class="flex items-center gap-2">
+    <DataBadge
+      label="дозировка"
+      value={$week.data?.dosage ? `${$week.data.dosage}` : ''}
+      unit="ед"
+      on:submit={(event) =>
+        $updateWeek.mutate({
+          start: format($weekStart, 'yyyy-MM-dd'),
+          dosage: event.detail.value,
+        })}
+    />
+    <DataBadge
+      label="вес"
+      value={$week.data?.weight ? `${$week.data.weight}` : ''}
+      unit="кг"
+      on:submit={(event) =>
+        $updateWeek.mutate({
+          start: format($weekStart, 'yyyy-MM-dd'),
+          weight: event.detail.value,
+        })}
+    />
+  </div>
 </div>
