@@ -154,6 +154,7 @@
           <td class="grid">
             <input
               bind:value={glucose}
+              autofocus
               class={clsx(
                 'px-2 bg-transparent w-full text-black dark:text-white dark:[color-scheme:dark] text-center placeholder:text-neutral-400 transition-colors placeholder:transition-colors',
                 error &&
