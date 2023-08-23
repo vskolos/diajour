@@ -15,13 +15,14 @@
   $: maxGlucoseLevel =
     $entryList.data
       ?.map((entry) => entry.glucose)
-      .reduce(
-        (prev, curr) => (curr > prev ? curr : prev),
-        GLUCOSE_LEVEL_TICKS[0]
-      ) ?? GLUCOSE_LEVEL_TICKS[0]
+      .reduce((prev, curr) => (curr > prev ? curr : prev), 0) ??
+    GLUCOSE_LEVEL_TICKS[0]
 
   $: ticks = GLUCOSE_LEVEL_TICKS.filter(
-    (level) => maxGlucoseLevel > 30 || level < maxGlucoseLevel
+    (level) =>
+      maxGlucoseLevel > 30 ||
+      (level % 10 === 0 && level - 10 < maxGlucoseLevel) ||
+      (level % 10 !== 0 && level - 5 < maxGlucoseLevel)
   )
 </script>
 
