@@ -2,8 +2,8 @@
   import clsx from 'clsx'
   import { createEventDispatcher } from 'svelte'
   import CheckIcon from '../icons/CheckIcon.svelte'
-  import PencilIcon from '../icons/PencilIcon.svelte'
   import PlusIcon from '../icons/PlusIcon.svelte'
+  import XMarkIcon from '../icons/XMarkIcon.svelte'
 
   export let label: string
   export let value: string
@@ -63,6 +63,9 @@
     <button type="submit">
       <CheckIcon class="w-2.5 h-2.5" />
     </button>
+    <button type="button" on:click={() => (editMode = false)}>
+      <XMarkIcon class="w-2.5 h-2.5" />
+    </button>
   </form>
 {:else if value}
   <button
@@ -71,7 +74,6 @@
       editMode = true
     }}
   >
-    <PencilIcon class="w-2.5 h-2.5" />
     {value}
     {unit}
   </button>
