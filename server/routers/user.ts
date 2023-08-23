@@ -6,12 +6,12 @@ import { db } from '../db'
 import { getUserBySessionId } from '../helpers'
 import { InsertUser, User, sessions, users } from '../schemas'
 import { authedProcedure, publicProcedure, router } from '../trpc'
-import { PASSWORD_REGEX, hashPassword } from '../utils'
+import { PASSWORD_REGEX, hashPassword, sanitizedUser } from '../utils'
 
 export const userRouter = router({
   data: authedProcedure.query(({ ctx }) => {
     const user = getUserBySessionId(ctx.sessionId)
-    return { username: user.username, avatar: user.avatar }
+    return sanitizedUser(user)
   }),
 
   signup: publicProcedure.input(InsertUser).mutation(({ input }) => {

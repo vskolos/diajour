@@ -1,11 +1,13 @@
 <script lang="ts">
   import clsx from 'clsx'
+  import type { Entry } from '../../../server/schemas'
   import EntryModal from '../../components/EntryModal.svelte'
-  import type { WeekData } from '../../types'
 
   let modal: EntryModal
 
-  export let entry: WeekData['entries'][number] | undefined
+  export let entry:
+    | Pick<Entry, 'id' | 'date' | 'timePeriod' | 'glucose'>
+    | undefined
 </script>
 
 {#if entry}

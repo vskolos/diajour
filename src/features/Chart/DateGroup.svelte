@@ -1,12 +1,12 @@
 <script lang="ts">
   import clsx from 'clsx'
-  import type { WeekData } from '../../types'
+  import type { Entry } from '../../../server/schemas'
 
-  export let entries: WeekData['entries']
+  export let entries: Pick<Entry, 'id' | 'date' | 'timePeriod' | 'glucose'>[]
   export let maxTickValue: number
 
   $: if (entries.length === 0)
-    entries.push({ date: '', period: 'midday', glucose: 0 })
+    entries.push({ id: 0, date: '', timePeriod: 'midday', glucose: 0 })
 </script>
 
 <div

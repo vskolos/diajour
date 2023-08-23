@@ -7,7 +7,7 @@
   import Cell from './Cell.svelte'
   import DateCell from './DateCell.svelte'
 
-  $: week = trpc.entries.list.query({
+  $: entryList = trpc.entry.list.query({
     weekStart: format($weekStart, 'yyyy-MM-dd'),
   })
 </script>
@@ -83,8 +83,8 @@
         {/if}
         {#each generateWeekDates($weekStart) as date}
           <Cell
-            entry={$week.data?.entries.find(
-              (entry) => entry.date === date && entry.period === period
+            entry={$entryList.data?.find(
+              (entry) => entry.date === date && entry.timePeriod === period
             )}
           />
         {/each}

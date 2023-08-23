@@ -2,60 +2,51 @@ import { TRPCError } from '@trpc/server'
 import { and, eq } from 'drizzle-orm'
 import { z } from 'zod'
 import { TIME_PERIODS } from '../../src/constants'
-import type { WeekData } from '../../src/types'
 import { db } from '../db'
-import { getUserBySessionId, getUserWeekFromDateString } from '../helpers'
-import { Entry, InsertEntry, entries, weeks } from '../schemas'
+import {
+  createWeek,
+  getUserBySessionId,
+  getWeekByUserIdAndDate,
+} from '../helpers'
+import { Entry, InsertEntry, entries } from '../schemas'
 import { authedProcedure, router } from '../trpc'
+import { sanitizedEntry } from '../utils'
 
 export const entryRouter = router({
   list: authedProcedure
     .input(z.object({ weekStart: z.string() }))
     .query(({ input, ctx }) => {
       const user = getUserBySessionId(ctx.sessionId)
+      const week = getWeekByUserIdAndDate({
+        userId: user.id,
+        date: input.weekStart,
+      })
 
-      const entriesAndWeeks = db
+      if (!week) return []
+
+      const entryList = db
         .select()
         .from(entries)
-        .innerJoin(weeks, eq(entries.weekId, weeks.id))
-        .where(
-          and(
-            eq(entries.userId, user.id),
-            eq(weeks.userId, user.id),
-            eq(weeks.start, input.weekStart)
-          )
-        )
+        .where(eq(entries.weekId, week.id))
         .all()
-
-      const entryList = entriesAndWeeks
-        .map((item) => ({
-          id: item.entries.id,
-          date: item.entries.date,
-          period: item.entries.timePeriod,
-          glucose: item.entries.glucose,
-        }))
+        .map(sanitizedEntry)
         .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
         .sort(
           (a, b) =>
-            TIME_PERIODS.indexOf(a.period) - TIME_PERIODS.indexOf(b.period)
+            TIME_PERIODS.indexOf(a.timePeriod) -
+            TIME_PERIODS.indexOf(b.timePeriod)
         )
 
-      const week = entriesAndWeeks[0]?.weeks
-
-      const weekData: WeekData = {
-        dosage: week?.dosage ?? null,
-        weight: week?.weight ?? null,
-        entries: entryList,
-      }
-
-      return weekData
+      return entryList
     }),
 
   create: authedProcedure
     .input(InsertEntry.pick({ date: true, timePeriod: true, glucose: true }))
     .mutation(({ input, ctx }) => {
       const user = getUserBySessionId(ctx.sessionId)
-      const week = getUserWeekFromDateString(user, input.date)
+      const week =
+        getWeekByUserIdAndDate({ userId: user.id, date: input.date }) ??
+        createWeek({ userId: user.id, start: input.date })
 
       const entry = db
         .select()
@@ -84,7 +75,9 @@ export const entryRouter = router({
     .input(InsertEntry.pick({ date: true, timePeriod: true, glucose: true }))
     .mutation(({ input, ctx }) => {
       const user = getUserBySessionId(ctx.sessionId)
-      const week = getUserWeekFromDateString(user, input.date)
+      const week =
+        getWeekByUserIdAndDate({ userId: user.id, date: input.date }) ??
+        createWeek({ userId: user.id, start: input.date })
 
       const entry = db
         .select()

@@ -2,16 +2,19 @@
   import clsx from 'clsx'
   import { format, parse, startOfWeek } from 'date-fns'
   import ru from 'date-fns/locale/ru'
+  import type { Entry } from '../../server/schemas'
   import TrashIcon from '../icons/TrashIcon.svelte'
   import XMarkIcon from '../icons/XMarkIcon.svelte'
   import { trpc } from '../main'
-  import type { TimePeriod, WeekData } from '../types'
+  import type { TimePeriod } from '../types'
   import Modal from './Modal.svelte'
 
   let modal: Modal
 
   export const open = () => modal.open()
-  export let entry: WeekData['entries'][number] | undefined = undefined
+  export let entry:
+    | Pick<Entry, 'id' | 'date' | 'timePeriod' | 'glucose'>
+    | undefined = undefined
 
   let date: string
   let timePeriod: TimePeriod
@@ -19,7 +22,7 @@
   let error: string
 
   function invalidateEntryListAndCloseModal(date: string) {
-    trpc.entries.list.utils.invalidate({
+    trpc.entry.list.utils.invalidate({
       weekStart: format(
         startOfWeek(parse(date, 'yyyy-MM-dd', new Date()), {
           weekStartsOn: 1,
@@ -30,15 +33,15 @@
     modal.close()
   }
 
-  const createEntry = trpc.entries.create.mutation({
+  const createEntry = trpc.entry.create.mutation({
     onSuccess: () => invalidateEntryListAndCloseModal(date),
   })
 
-  const updateEntry = trpc.entries.update.mutation({
+  const updateEntry = trpc.entry.update.mutation({
     onSuccess: () => invalidateEntryListAndCloseModal(date),
   })
 
-  const deleteEntry = trpc.entries.delete.mutation({
+  const deleteEntry = trpc.entry.delete.mutation({
     onSuccess: () => invalidateEntryListAndCloseModal(date),
   })
 
@@ -48,7 +51,7 @@
 
     date = entry ? entry.date : format(now, 'yyyy-MM-dd', { locale: ru })
     timePeriod = entry
-      ? entry.period
+      ? entry.timePeriod
       : currentHour < 12
       ? 'morning'
       : currentHour < 18

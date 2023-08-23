@@ -4,11 +4,19 @@
   import ru from 'date-fns/locale/ru'
   import { trpc } from '../main'
   import { weekStart } from '../stores'
+  import DataBadge from './DataBadge.svelte'
 
   const now = new Date()
 
-  $: week = trpc.entries.list.query({
-    weekStart: format($weekStart, 'yyyy-MM-dd'),
+  $: week = trpc.week.get.query({
+    date: format($weekStart, 'yyyy-MM-dd'),
+  })
+
+  const updateWeek = trpc.week.update.mutation({
+    onSuccess: () =>
+      trpc.entry.list.utils.invalidate({
+        weekStart: format($weekStart, 'yyyy-MM-dd'),
+      }),
   })
 
   let className = ''
@@ -27,18 +35,28 @@
           { locale: ru }
         )}`}
   </h2>
-  <div class="flex items-center gap-2">
-    {#if $week.data && $week.data.dosage !== null}
-      <span
-        class="py-1 text-xs px-2 text-center rounded-md bg-neutral-100 transition-colors dark:bg-neutral-900 dark:text-white"
-        >{$week.data.dosage} ед</span
-      >
-    {/if}
-    {#if $week.data && $week.data.weight !== null}
-      <span
-        class="py-1 text-xs px-2 text-center rounded-md bg-neutral-100 transition-colors dark:bg-neutral-900 dark:text-white"
-        >{$week.data.weight} кг</span
-      >
-    {/if}
-  </div>
+  {#if $week.data}
+    <div class="flex items-center gap-2">
+      <DataBadge
+        label="дозировка"
+        value={$week.data.dosage ? `${$week.data.dosage}` : ''}
+        unit="ед"
+        on:submit={(event) =>
+          $updateWeek.mutate({
+            start: format($weekStart, 'yyyy-MM-dd'),
+            dosage: event.detail.value,
+          })}
+      />
+      <DataBadge
+        label="вес"
+        value={$week.data.weight ? `${$week.data.weight}` : ''}
+        unit="кг"
+        on:submit={(event) =>
+          $updateWeek.mutate({
+            start: format($weekStart, 'yyyy-MM-dd'),
+            weight: event.detail.value,
+          })}
+      />
+    </div>
+  {/if}
 </div>

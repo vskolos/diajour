@@ -8,13 +8,13 @@
   import { generateWeekDates } from '../../utils'
   import DateGroup from './DateGroup.svelte'
 
-  $: week = trpc.entries.list.query({
+  $: entryList = trpc.entry.list.query({
     weekStart: format($weekStart, 'yyyy-MM-dd'),
   })
 
   $: maxGlucoseLevel =
-    $week.data?.entries
-      .map((entry) => entry.glucose)
+    $entryList.data
+      ?.map((entry) => entry.glucose)
       .reduce(
         (prev, curr) => (curr > prev ? curr : prev),
         GLUCOSE_LEVEL_TICKS[0]
@@ -43,8 +43,7 @@
   >
     {#each generateWeekDates($weekStart) as date}
       <DateGroup
-        entries={$week.data?.entries.filter((entry) => entry.date === date) ??
-          []}
+        entries={$entryList.data?.filter((entry) => entry.date === date) ?? []}
         maxTickValue={ticks[0]}
       />
     {/each}

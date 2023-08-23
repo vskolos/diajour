@@ -1,2 +1,3 @@
+export * from './createWeek'
 export * from './getUserBySessionId'
-export * from './getUserWeekFromDateString'
+export * from './getWeekByUserIdAndDate'
