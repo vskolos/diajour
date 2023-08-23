@@ -42,10 +42,10 @@ export const weekRouter = router({
         db.update(weeks)
           .set({ dosage: input.dosage, weight: input.weight })
           .where(eq(weeks.id, week.id))
-          .get()
+          .run()
       else
         db.insert(weeks)
           .values({ userId: user.id, ...input })
-          .get()
+          .run()
     }),
 })
