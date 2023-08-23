@@ -16,6 +16,13 @@ export const trpc = createTRPCSvelte<AppRouter>({
         : undefined,
     }),
   ],
+  queryClientConfig: {
+    defaultOptions: {
+      queries: {
+        staleTime: 1000 * 60, // 1 minute
+      },
+    },
+  },
 })
 
 export default new App({
