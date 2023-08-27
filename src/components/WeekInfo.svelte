@@ -14,8 +14,8 @@
 
   const updateWeek = trpc.week.update.mutation({
     onSuccess: () =>
-      trpc.entry.list.utils.invalidate({
-        weekStart: format($weekStart, 'yyyy-MM-dd'),
+      trpc.week.get.utils.invalidate({
+        date: format($weekStart, 'yyyy-MM-dd'),
       }),
   })
 
