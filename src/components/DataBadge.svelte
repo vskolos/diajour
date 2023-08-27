@@ -36,10 +36,13 @@
   // }
 
   function handleSubmit() {
-    const parsed = parseFloat(value)
-    if (value !== '' && isNaN(parsed)) return (error = true)
+    error = false
+    if (!value) return (error = true)
 
-    dispatch('submit', { value: parsed || null })
+    const parsedValue = parseFloat(value.replaceAll(',', '.'))
+    if (value !== '' && isNaN(parsedValue)) return (error = true)
+
+    dispatch('submit', { value: parsedValue || null })
     editMode = false
   }
 </script>
