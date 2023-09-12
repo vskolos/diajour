@@ -1,7 +1,13 @@
-import { createTRPCSvelte, httpBatchLink } from 'trpc-svelte-query'
+import { QueryCache } from '@tanstack/svelte-query'
+import {
+  TRPCClientError,
+  createTRPCSvelte,
+  httpBatchLink,
+} from 'trpc-svelte-query'
 import type { AppRouter } from '../server'
 import App from './App.svelte'
 import './app.css'
+import { loggedIn } from './stores'
 
 export const trpc = createTRPCSvelte<AppRouter>({
   links: [
@@ -22,6 +28,12 @@ export const trpc = createTRPCSvelte<AppRouter>({
         staleTime: 1000 * 60, // 1 minute
       },
     },
+    queryCache: new QueryCache({
+      onError: (error) =>
+        error instanceof TRPCClientError &&
+        error.data.code === 'UNAUTHORIZED' &&
+        loggedIn.set(false),
+    }),
   },
 })
 

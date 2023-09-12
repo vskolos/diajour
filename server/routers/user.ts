@@ -1,9 +1,9 @@
 import { TRPCError } from '@trpc/server'
 import crypto from 'crypto'
-import { addDays } from 'date-fns'
+import { addDays, format } from 'date-fns'
 import { eq } from 'drizzle-orm'
 import { db } from '../db'
-import { getUserBySessionId } from '../helpers'
+import { deleteExpiredSessions, getUserBySessionId } from '../helpers'
 import { InsertUser, User, sessions, users } from '../schemas'
 import { authedProcedure, publicProcedure, router } from '../trpc'
 import { PASSWORD_REGEX, hashPassword, sanitizedUser } from '../utils'
@@ -88,8 +88,10 @@ export const userRouter = router({
           message: 'Неверно введен пароль',
         })
 
+      deleteExpiredSessions()
+
       let session = db
-        .select({ id: sessions.id })
+        .select()
         .from(sessions)
         .where(eq(sessions.userId, user.id))
         .get()
@@ -100,8 +102,9 @@ export const userRouter = router({
           .values({
             id: crypto.randomBytes(64).toString('hex'),
             userId: user.id,
+            expiresAt: format(addDays(new Date(), 1), 'yyyy-MM-dd HH:mm:ss'),
           })
-          .returning({ id: sessions.id })
+          .returning()
           .get()
       }
 
