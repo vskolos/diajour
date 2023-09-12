@@ -10,6 +10,9 @@ export const sessions = sqliteTable('sessions', {
   createdAt: text('created_at')
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
+  updatedAt: text('updated_at')
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
 })
 
 export const Session = createSelectSchema(sessions)
