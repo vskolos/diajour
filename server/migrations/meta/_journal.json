@@ -15,6 +15,13 @@
       "when": 1694521246279,
       "tag": "0001_handy_starhawk",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1694523536901,
+      "tag": "0002_black_pestilence",
+      "breakpoints": true
     }
   ]
 }

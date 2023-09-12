@@ -10,7 +10,7 @@ export const sessions = sqliteTable('sessions', {
   createdAt: text('created_at')
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
-  updatedAt: text('updated_at')
+  expiresAt: text('expires_at')
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
 })
