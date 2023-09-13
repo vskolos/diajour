@@ -11,7 +11,10 @@
 
   let modal: Modal
 
-  export const open = () => modal.open()
+  export const open = () => {
+    modal.open()
+    setDefaults()
+  }
   export let entry:
     | Pick<Entry, 'id' | 'date' | 'timePeriod' | 'glucose'>
     | undefined = undefined
@@ -63,8 +66,6 @@
     $createEntry.reset()
     $updateEntry.reset()
   }
-
-  setDefaults()
 
   function handleSubmit() {
     error = ''
